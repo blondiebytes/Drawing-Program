@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="Drawing">
+</Property><Property Name="Solution File" Value="E:\My Documents\Visual Studio 2005\Projects\378-Projects\Solutions\Drawing\Drawing.sln">
+</Property><Property Name="User Options File" Value="E:\My Documents\Visual Studio 2005\Projects\378-Projects\Solutions\Drawing\Drawing.suo">
+</Property><Property Name="Date" Value="Wednesday, May 28, 2008">
+</Property><Property Name="Time" Value="18:46 PM">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="Drawing.sln" Description="File successfully backed up as E:\My Documents\Visual Studio 2005\Projects\378-Projects\Solutions\Drawing\Drawing.sln.old">
+</Event><Event ErrorLevel="0" Project="" Source="Drawing.suo" Description="File successfully backed up as E:\My Documents\Visual Studio 2005\Projects\378-Projects\Solutions\Drawing\Drawing.suo.old">
+</Event><Event ErrorLevel="0" Project="Drawing" Source="Drawing.vcproj" Description="Web deployment to the local IIS server is no longer supported. The Web Deployment build tool has been removed from your project settings.">
+</Event><Event ErrorLevel="1" Project="Drawing" Source="Drawing.vcproj" Description="This application has been updated to include settings related to the User Account Control (UAC) feature of Windows Vista. By default, when run on Windows Vista with UAC enabled, this application is marked to run with the same privileges as the process that launched it. This marking also disables the application from running with virtualization. You can change UAC related settings from the Property Pages of the project.">
+</Event><Event ErrorLevel="0" Project="Drawing" Source="Drawing.vcproj" Description="Project file successfully backed up as 'E:\My Documents\Visual Studio 2005\Projects\378-Projects\Solutions\Drawing\Drawing.vcproj.8.00.old'.">
+</Event><Event ErrorLevel="0" Project="Drawing" Source="Drawing.vcproj" Description="Project upgraded successfully.">
+</Event><Event ErrorLevel="3" Project="Drawing" Source="Drawing.vcproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="Drawing.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="Drawing.sln" Description="Converted">
+</Event></UpgradeLog>

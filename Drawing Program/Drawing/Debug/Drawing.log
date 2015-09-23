@@ -1,0 +1,22 @@
+﻿Build started 9/22/2015 2:13:10 PM.
+     1>Project "C:\Users\Physics\Desktop\Graphics-master\Drawing Program\Drawing\Drawing.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt drawing.cpp graphics.cpp matrix.cpp scene.cpp
+         scene.cpp
+         matrix.cpp
+         graphics.cpp
+         drawing.cpp
+     1>c:\users\physics\desktop\graphics-master\drawing program\drawing\drawing.cpp(789): warning C4018: '<': signed/unsigned mismatch
+         Generating Code...
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Physics\Desktop\Graphics-master\Drawing Program\Drawing\Debug\Drawing.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\Physics\Desktop\Graphics-master\Drawing Program\Drawing\Debug\Drawing.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE:NO /IMPLIB:"C:\Users\Physics\Desktop\Graphics-master\Drawing Program\Drawing\Debug\Drawing.lib" /MACHINE:X86 /SAFESEH Debug\drawing.obj
+         Debug\graphics.obj
+         Debug\matrix.obj
+         Debug\scene.obj
+     1>drawing.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
+         Drawing.vcxproj -> C:\Users\Physics\Desktop\Graphics-master\Drawing Program\Drawing\Debug\Drawing.exe
+     1>Done Building Project "C:\Users\Physics\Desktop\Graphics-master\Drawing Program\Drawing\Drawing.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.94
