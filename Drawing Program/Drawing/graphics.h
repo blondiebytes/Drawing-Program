@@ -26,6 +26,7 @@ class TransformStack
    Matrix* top();
   private:
   //Student must implement.
+
 };
 
 void setHighlight(bool highlight);

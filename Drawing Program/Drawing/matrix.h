@@ -11,6 +11,7 @@ class Vector
    double& operator[](int index) const;
   private:
   //Student must implement.
+	  double* data;
 };
 
 class Matrix

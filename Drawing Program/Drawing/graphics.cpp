@@ -98,14 +98,15 @@ void gPop()
 
 void drawLine(double x0, double y0, double x1, double y1)
 {
-
+	glBegin(GL_LINE);
+	glVertex2i(x0, y0);
+	glVertex2i(x0, x1);
+	glEnd();
 }
 
 void drawLine(Vector* p0, Vector* p1)
 {
 	glBegin(GL_LINE);
-	glVertex2i(p0[0], p0[1]);
-	glVertex2i(p1[0], p1[1]);
 	glEnd();
 }
 

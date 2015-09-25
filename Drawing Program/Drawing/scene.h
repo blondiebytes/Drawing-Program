@@ -40,7 +40,14 @@ class TransformNode
    void deSelect();
    static TransformNode* nodeLookup(int identifier);
   private:
-  //Student must implement.
+	  TransformNode* parent;
+	  ShapeNode* shapeNode;
+	  Matrix* matrix;
+	  list<TransformNode*> children;
+	  bool selected;
+	  static int count;
+	  int identifier;
+	  static map<int, TransformNode*> idTransformNodeTable;
 };
 
 class ShapeNode
@@ -52,9 +59,9 @@ class ShapeNode
    TransformNode* getTransformNode();
    virtual ShapeNode* clone() const = 0;
   private:
-  //Student must implement.
+	  TransformNode* transformNode;
   protected:
-  //Student must implement.
+	  colorType color;
 };
 
 class Line : public ShapeNode
@@ -64,7 +71,10 @@ class Line : public ShapeNode
    virtual ShapeNode* clone() const;
    virtual void draw() const;
   private:
-  //Student must implement.
+	  double x_0;
+	  double x_1;
+	  double y_0;
+	  double y_1;
 };
 
 class Rectangle : public ShapeNode
@@ -74,7 +84,10 @@ class Rectangle : public ShapeNode
    virtual ShapeNode* clone() const;
    virtual void draw() const;
   private:
-  //Student must implement.
+	  double x_0;
+	  double x_1;
+	  double y_0;
+	  double y_1;
 };
 
 
@@ -85,7 +98,9 @@ class Circle : public ShapeNode
    virtual ShapeNode* clone() const;
    virtual void draw() const;
   private:
-  //Student must implement.
+	  double cX;
+	  double cY;
+	  double radius;
 };
 
 class Polygon : public ShapeNode
@@ -96,7 +111,7 @@ class Polygon : public ShapeNode
    virtual ShapeNode* clone() const;
    virtual void draw() const;
   private:
-  //Student must implement.
+	  list<Vector*> vertices;
 };
 
 #endif
