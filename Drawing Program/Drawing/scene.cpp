@@ -31,7 +31,7 @@ TransformNode::TransformNode(TransformNode* p, ShapeNode* s, Matrix* t)
 TransformNode::~TransformNode()
 {
 	// delete children first
-	children.clear;
+	children.clear();
 	// then the parent
 	delete[] parent;
 	delete[] shapeNode;
@@ -67,9 +67,42 @@ void TransformNode::scale(double scaleX, double scaleY)
 	matrix = Matrix::scaling(scaleX, scaleY)->multiply(matrix);
 }
 
+// Draw the portion of the scene represented by this transform node
+// If displayHelpers is true, display a square indicating the origin
+// of the coordinate system of this node !!!!
 void TransformNode::draw(bool displayHelpers) const
 {
+	// Pushing on the matrix and identifier before we draw
+	gPush(matrix);
+	glPushName(identifier);
+	
+	// Getting the highlight;
+	bool highlight = getHighlight();
 
+	// If selected.. we set the highlight to selected
+	if (selected) {
+		setHighlight(selected);
+	}
+
+	// Draw the shape node first if we have one
+	if (shapeNode != NULL) {
+		shapeNode->draw();
+	}
+
+	// ??  What does :: mean? --> Membership + Templates
+	for (list<TransformNode*> :: const_iterator i = children.begin(); i != children.end(); i++) {
+		// What does -> mean??
+		// Draw all the children until we run out
+		(*i)->draw(displayHelpers);
+	}
+
+	// where do we do stuff with displayHelpers??
+
+	// Pop it all off because we are done
+	setHighlight(highlight);
+	glPopName();
+	gPop();
+		
 }
 
 // Return the parent of this transform node
@@ -88,13 +121,31 @@ void TransformNode::setParent(TransformNode* p)
 // system of this node remains unchanged.
 void TransformNode::changeParent(TransformNode* newParent)
 {
-	//??
-	parent - newParent;
+	//?? How do we take care of the coordinate system
+	parent = newParent;
 }
 
+// Construct a new transform node under this object. Make groupMembers children
+// of the new transform node. Assume all members are presently children of this node. !! ??
 void TransformNode::groupObjects(set<TransformNode*>& groupMembers)
 {
- 
+ // Create a new transform node with this object as the parent
+	TransformNode temp = new TransformNode(this);
+
+	// VIA ITERATION:
+	// 1. Remove the children from their current parent
+	// 2. Make temp their new parent
+	for (set<TransformNode*> ::iterator i = groupMembers.begin(); i != groupMembers.end(); i++) {
+		// Remove child from current parent
+		//(*i).getParent().remove(*i); --> won't allow access
+		// Make temp their new parent
+		temp.children.push_back(*i);
+
+		// OR
+		//(*i).changeParent(temp);
+	}
+
+
 }
 
 // Return the matrix representing the transform associated with this node
@@ -103,40 +154,91 @@ Matrix* TransformNode::getTransform() const
 	return matrix;
 }
 
+// Return a copy of this transform node, its shapeNode (if any) and 
+// its descendant transform nodes. The copy should have a NULL parent
 TransformNode* TransformNode::clone() const
 {
-   return NULL;
+	// We have null for the parent because we want to use this clone elsewhere
+	// What about childrent/descendant nodes??
+	return (TransformNode*)(NULL, shapeNode, matrix);
 }
 
+// Add child to the collection of children of this transform node
 void TransformNode::addChild(TransformNode* child)
 {
-
+	// add the child to list of transform nodes
+	children.push_back(child);
 }
 
+// Remove child from the collection of children of this transform node
 void TransformNode::removeChild(TransformNode* child)
 {
-	
+	// remove the child from the list of transform nodes
+	children.remove(child);
 }
 
 // Return the first child in the collection of children of this transform node
 TransformNode* TransformNode::firstChild() const
 {
-	return children._Getpfirst;
+	// return the first
+	return children.front();
 }
 
+// Returns the last child in the collection of children of this transform node
 TransformNode* TransformNode::lastChild() const
 {
-	return NULL;
+	// return the last
+	return children.back();
 }
 
+// Returns the child next after param child in the collection of children 
+// in this transform node !!
 TransformNode* TransformNode::nextChild(TransformNode* child) const
 {
-   return NULL;
+	// we must iterate through the children...
+	list<TransformNode*> ::const_iterator i = children.begin();
+
+	// Is there a way to simplify this??
+	for (; (*i) != child; i++) {
+		// Get i to its correct position/index
+	}
+	
+	// Increment i so that we are at the nextChild...
+	i++;
+
+	// If the nextChild is at the end, then we reset to the beginning
+	if (i == children.end()) {
+		i = children.begin();
+	}
+
+	// We return the child at the pointer i
+	return (*i);
+		
 }
 
+// Returns the child before the param child in the collection of children
+// in this transform node !!
 TransformNode* TransformNode::previousChild(TransformNode* child) const
 {
-   return NULL;
+	// we must iterate through the children...
+	list<TransformNode*> ::const_iterator i = children.begin();
+
+	// Is there a way to simplify this??
+	for (; (*i) != child; i++) {
+		// Get i to its correct position/index
+	}
+
+	// Decrement i so that we are at the previousChild...
+	i--;
+
+	// If the previousChild is at the end, then we reset to the beginning
+	if (i == children.end()) {
+		i = children.begin();
+	}
+
+	// We return the child at the pointer i
+	return (*i);
+
 }
 
 // Mark this transform node as selected so that its subtree is 
@@ -191,14 +293,22 @@ Line::Line(double xx0, double yy0, double xx1, double yy1, colorType c)
 }
 
 
+// Clone a line
 ShapeNode* Line::clone() const
 {
-   return NULL;
+	// Return a line with the appropriate specifications
+	// A line is a ShapeNode so we can return it instead of
+	// just a bland ShapeNode
+	return (Line*)(x_0, y_0, x_1, y_1, color);
 }
 
+// Draw a line
 void Line::draw() const
 {
-
+	// Set the color to the right one
+	setColor(color);
+	// And draw out the line
+	drawLine(x_0, y_0, x_1, y_1);
 }
 
 
@@ -215,15 +325,19 @@ Rectangle::Rectangle(double xx0, double yy0, double xx1, double yy1, colorType c
 	color = c;
 }
 
-
+// Clone the rectangle
 ShapeNode* Rectangle::clone()  const
 {
-   return NULL;
+   return (Rectangle*)(x_0, y_0, x_1, y_1, color);
 }
 
+// Draw the rectangle
 void Rectangle::draw() const
 {
-
+	// Set the appropriate color
+	setColor(color);
+	// And then draw it out
+	drawRectangle(x_0, y_0, x_1, y_1);
 }
 
 // Initialize a circle of color c with center (cX, cY) and radius r in 
@@ -237,14 +351,19 @@ Circle::Circle(double ccX, double ccY, double r, colorType c)
 	radius = r;
 }
 
+// Clone the circle
 ShapeNode* Circle::clone() const
 {
-   return NULL;
+	return (Circle *)(cX, cY, radius, color);
 }
 
+// Draw a circle
 void Circle::draw() const
 {
-
+	// Set the appropriate color
+	setColor(color);
+	// And then draw it out
+	drawCircle(cX, cY, radius);
 }
 
 //Why do we need & sign??
@@ -256,18 +375,29 @@ Polygon::Polygon(const list<Vector*>& vs, colorType c)
 	vertices = vs;
 }
 
+// Delete a Polygon
 Polygon::~Polygon()
 {
-
+	// Iterate through the vertices, deleting each one
+	for (list<Vector*> ::const_iterator i = vertices.begin(); i != vertices.end(); i++) {
+		// Go delete the vertex at i
+		delete(*i);
+	}
+	// Do we need to delete anything else??
 }
 
+// Clone a Polygon
 ShapeNode* Polygon::clone() const
 {
-   return NULL;
+	return (Polygon*)(vertices, color);
 }
 
+// Draw a polygon
 void Polygon::draw() const
 {
-
+	// Set a color
+	setColor(color);
+	// Draw it out
+	drawPolygon(vertices);
 }
 

@@ -7,8 +7,10 @@
 
 using namespace std;
 
+const double PI = 3.14159265358979328462643383;
 const double TWO_PI = 6.283185307179586476925286766559;
 const int CIRCLE_SECTIONS = 360;
+const double DELTA = TWO_PI / CIRCLE_SECTIONS;
 
 typedef enum {BLACK, BLUE, CYAN, GREEN, MAGENTA, RED, WHITE, YELLOW, GRAY} colorType;
 
@@ -25,7 +27,7 @@ class TransformStack
    void pop();
    Matrix* top();
   private:
-  //Student must implement.
+	  stack<Matrix*> mStack;
 
 };
 

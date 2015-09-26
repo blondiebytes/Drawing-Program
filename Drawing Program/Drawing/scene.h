@@ -45,8 +45,8 @@ class TransformNode
 	  Matrix* matrix;
 	  list<TransformNode*> children;
 	  bool selected;
-	  static int count;
 	  int identifier;
+	  static int count;
 	  static map<int, TransformNode*> idTransformNodeTable;
 };
 
