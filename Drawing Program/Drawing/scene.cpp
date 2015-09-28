@@ -4,26 +4,20 @@
 #include "scene.h"
 
 
+int TransformNode::count = 0;
+map<int, TransformNode*> TransformNode::idTransformNodeTable = map<int, TransformNode*>();
 
 // Initialize this transform node to have parent p, shape node NULL, and the transform identity
-TransformNode::TransformNode(TransformNode* p)
+TransformNode::TransformNode(TransformNode* p) : parent(p), shapeNode(NULL), 
+matrix(new Matrix()), selected(false), identifier(count++)
 {
-	parent = p;
-	shapeNode = NULL;
-	matrix = new Matrix();
-	selected = false;
-	identifier = count++;
 	idTransformNodeTable[identifier] = this;
 }
 
 // Initialize this transform to have parent p, shape node s, and transform t
-TransformNode::TransformNode(TransformNode* p, ShapeNode* s, Matrix* t)
+TransformNode::TransformNode(TransformNode* p, ShapeNode* s, Matrix* t) : parent(p), shapeNode(s), matrix(t), 
+selected(false), identifier(count++)
 {
-	parent = p;
-	shapeNode = s;
-	matrix = t;
-	selected = false;
-	identifier = count++;
 	idTransformNodeTable[identifier] = this;
 }
 
@@ -48,7 +42,7 @@ void TransformNode::translate(double deltaX, double deltaY)
 // Update this transform node to rotate by theta around the origin in world coordinates
 void TransformNode::rotate(double theta)
 {
-	// move to the origin... then ??
+	// move to the origin...?? I want deltaX to be opposite X, deltaY to be oppositeY
 	// rotationMatrix * originalMatrix = newMatrix
 	matrix = Matrix::rotation(theta)->multiply(matrix);
 }
@@ -91,7 +85,6 @@ void TransformNode::draw(bool displayHelpers) const
 
 	// ??  What does :: mean? --> Membership + Templates
 	for (list<TransformNode*> :: const_iterator i = children.begin(); i != children.end(); i++) {
-		// What does -> mean??
 		// Draw all the children until we run out
 		(*i)->draw(displayHelpers);
 	}
@@ -263,11 +256,7 @@ TransformNode* TransformNode::nodeLookup(int identifier)
 
 // Initialize this shape node sub-object with color c and NULL
 // transform node
-ShapeNode::ShapeNode(colorType c) 
-{
-	transformNode = NULL;
-	color = c;
-}
+ShapeNode::ShapeNode(colorType c) : color(c), transformNode(NULL) {}
 
 // Set tn to be the transform node of this shape node
 void ShapeNode::setTransformNode(TransformNode* tn)
@@ -283,14 +272,7 @@ TransformNode* ShapeNode::getTransformNode()
 
 // Initializes line object of color c connecting (x0, y0) and (x1,y1) in world coordinates
 Line::Line(double xx0, double yy0, double xx1, double yy1, colorType c)
-	: ShapeNode(c)
-{
-	x_0 = xx0;
-	x_1 = xx1;
-	y_0 = yy0;
-	y_1 = yy1;
-	color = c;
-}
+	: ShapeNode(c), x_0(xx0), x_1(xx1), y_0(yy0), y_1(yy1) {}
 
 
 // Clone a line
@@ -311,19 +293,10 @@ void Line::draw() const
 	drawLine(x_0, y_0, x_1, y_1);
 }
 
-
 // Initializes recentage of color c with opposite corners (x0, y0) and (x1, y1)
 // in world coordinates
 Rectangle::Rectangle(double xx0, double yy0, double xx1, double yy1, colorType c)
-	: ShapeNode(c)
-{
-	color = c;
-	x_0 = xx0;
-	x_1 = xx1;
-	y_0 = yy0;
-	y_1 = yy1;
-	color = c;
-}
+	: ShapeNode(c), x_0(xx0), x_1(xx1), y_0(yy0), y_1(yy1) {}
 
 // Clone the rectangle
 ShapeNode* Rectangle::clone()  const
@@ -342,14 +315,9 @@ void Rectangle::draw() const
 
 // Initialize a circle of color c with center (cX, cY) and radius r in 
 // world coordinates
-Circle::Circle(double ccX, double ccY, double r, colorType c) 
-	: ShapeNode(c)
+Circle::Circle(double ccX, double ccY, double r, colorType c)
+	: ShapeNode(c), cX(ccX), cY(ccY), radius(r) {}
 
-{
-	cX = ccX;
-	cY = ccY;
-	radius = r;
-}
 
 // Clone the circle
 ShapeNode* Circle::clone() const
@@ -366,14 +334,9 @@ void Circle::draw() const
 	drawCircle(cX, cY, radius);
 }
 
-//Why do we need & sign??
 // Initialize a polygon of color c with vertices vs in world coordinates
-Polygon::Polygon(const list<Vector*>& vs, colorType c) 
-	: ShapeNode(c)
-{
-	color = c;
-	vertices = vs;
-}
+Polygon::Polygon(const list<Vector*>& vs, colorType c)
+	: ShapeNode(c), vertices(vs) {}
 
 // Delete a Polygon
 Polygon::~Polygon()

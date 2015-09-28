@@ -66,9 +66,8 @@ void setColor( colorType color )
 TransformStack transformStack;
 
 // Initializes this transform stack to hold only an identity matrix
-TransformStack::TransformStack()
+TransformStack::TransformStack() : mStack(stack<Matrix*>())
 {
-	mStack = stack<Matrix*>();
 	mStack.push(new Matrix());
 }
 
@@ -100,6 +99,9 @@ Matrix* TransformStack::top()
 {
 	if (!mStack.empty()) {
 		return mStack.top();
+	}
+	else {
+		return NULL;
 	}
 }
 
