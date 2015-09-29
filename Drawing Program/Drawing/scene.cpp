@@ -32,25 +32,41 @@ TransformNode::~TransformNode()
 	delete(matrix);
 }
 
+// Computing the Cumulative World Transform Node (CWT)
+//TransformNode* getCumulativeWorldTransform(TransformNode* node) {
+//	if (node->getParent() == NULL) {
+//		return node->getTransform;
+//	}
+//	else {
+		// How do we multiply transform nodes?
+//		return getCumulativeWorldTransform(node->getParent()) * node->getTransform();
+//	}
+//}
+
 // Update this transform node nto translate by (dx, dy) in world coordinates
 void TransformNode::translate(double deltaX, double deltaY)
 {
 	// transformationMatrix * originalMatrix = newMatrix
+	// X = CWT(transformNode)-1 * transformation * CWT(transformNode)
 	matrix = Matrix::translation(deltaX, deltaY)->multiply(matrix);
 }
 
 // Update this transform node to rotate by theta around the origin in world coordinates
 void TransformNode::rotate(double theta)
 {
-	// move to the origin...?? I want deltaX to be opposite X, deltaY to be oppositeY
+	// move to the origin...!! I want deltaX to be opposite X, deltaY to be oppositeY
 	// rotationMatrix * originalMatrix = newMatrix
-	matrix = Matrix::rotation(theta)->multiply(matrix);
+	// X = newMatrix
+	// X = CWT(transformNode)-1 * transformation * CWT(transformNode)
+
+	matrix = (Matrix::rotation(theta))->multiply(matrix);
 }
 
 // Update this transform node to apply shear (sXY, sYX) in world coordinates
 void TransformNode::shear(double shearXY, double shearYX)
 {
 	// shearingMatrix * originalMatrix = newMatrix
+	// X = CWT(transformNode)-1 * transformation * CWT(transformNode)
 	matrix = Matrix::shearing(shearXY, shearYX)->multiply(matrix);
 }
 
@@ -58,6 +74,7 @@ void TransformNode::shear(double shearXY, double shearYX)
 void TransformNode::scale(double scaleX, double scaleY)
 {
 	// scalingMatrix * originalMatrix = newMatrix
+	// X = CWT(transformNode)-1 * transformation * CWT(transformNode)
 	matrix = Matrix::scaling(scaleX, scaleY)->multiply(matrix);
 }
 
@@ -71,11 +88,11 @@ void TransformNode::draw(bool displayHelpers) const
 	glPushName(identifier);
 	
 	// Getting the highlight;
-	bool highlight = getHighlight();
+	bool oldSelected = getHighlight();
 
 	// If selected.. we set the highlight to selected
 	if (selected) {
-		setHighlight(selected);
+		setHighlight(true);
 	}
 
 	// Draw the shape node first if we have one
@@ -83,16 +100,15 @@ void TransformNode::draw(bool displayHelpers) const
 		shapeNode->draw();
 	}
 
-	// ??  What does :: mean? --> Membership + Templates
 	for (list<TransformNode*> :: const_iterator i = children.begin(); i != children.end(); i++) {
 		// Draw all the children until we run out
 		(*i)->draw(displayHelpers);
 	}
 
-	// where do we do stuff with displayHelpers??
+	// where do we do stuff with displayHelpers?? LATER
 
 	// Pop it all off because we are done
-	setHighlight(highlight);
+	setHighlight(oldSelected);
 	glPopName();
 	gPop();
 		
@@ -114,31 +130,30 @@ void TransformNode::setParent(TransformNode* p)
 // system of this node remains unchanged.
 void TransformNode::changeParent(TransformNode* newParent)
 {
-	//?? How do we take care of the coordinate system
+	//!! How do we take care of the coordinate system
+	// X = new matrix
+	// X = CWT(Pnew)-1 * CWT(Pold) * (old matrix)
 	parent = newParent;
 }
 
 // Construct a new transform node under this object. Make groupMembers children
-// of the new transform node. Assume all members are presently children of this node. !! ??
+// of the new transform node. Assume all members are presently children of this node. 
 void TransformNode::groupObjects(set<TransformNode*>& groupMembers)
 {
  // Create a new transform node with this object as the parent
-	TransformNode temp = new TransformNode(this);
+	TransformNode* temp = new TransformNode(this);
 
 	// VIA ITERATION:
 	// 1. Remove the children from their current parent
 	// 2. Make temp their new parent
 	for (set<TransformNode*> ::iterator i = groupMembers.begin(); i != groupMembers.end(); i++) {
 		// Remove child from current parent
-		//(*i).getParent().remove(*i); --> won't allow access
+		(*i)->getParent()->removeChild(*i);
 		// Make temp their new parent
-		temp.children.push_back(*i);
-
-		// OR
-		//(*i).changeParent(temp);
+		temp->addChild(*i);
 	}
-
-
+	// Add temp to be a child of this transformNode
+	this->addChild(temp);
 }
 
 // Return the matrix representing the transform associated with this node
@@ -151,9 +166,16 @@ Matrix* TransformNode::getTransform() const
 // its descendant transform nodes. The copy should have a NULL parent
 TransformNode* TransformNode::clone() const
 {
-	// We have null for the parent because we want to use this clone elsewhere
-	// What about childrent/descendant nodes??
-	return (TransformNode*)(NULL, shapeNode, matrix);
+	Matrix* matrixCopy = new Matrix(*matrix);
+	ShapeNode* shapeNodeCopy = shapeNode->clone();
+	TransformNode* nodeCopy = new TransformNode(NULL, shapeNodeCopy, matrixCopy);
+
+	for (list<TransformNode*> ::iterator i = children.cbegin; i != children.end(); i++) {
+		nodeCopy->addChild((*i));
+	}
+	
+	return nodeCopy;
+	
 }
 
 // Add child to the collection of children of this transform node
@@ -161,6 +183,7 @@ void TransformNode::addChild(TransformNode* child)
 {
 	// add the child to list of transform nodes
 	children.push_back(child);
+	child->parent = this;
 }
 
 // Remove child from the collection of children of this transform node
@@ -168,6 +191,7 @@ void TransformNode::removeChild(TransformNode* child)
 {
 	// remove the child from the list of transform nodes
 	children.remove(child);
+	child->parent = NULL;
 }
 
 // Return the first child in the collection of children of this transform node
@@ -185,13 +209,12 @@ TransformNode* TransformNode::lastChild() const
 }
 
 // Returns the child next after param child in the collection of children 
-// in this transform node !!
+// in this transform node
 TransformNode* TransformNode::nextChild(TransformNode* child) const
 {
 	// we must iterate through the children...
 	list<TransformNode*> ::const_iterator i = children.begin();
 
-	// Is there a way to simplify this??
 	for (; (*i) != child; i++) {
 		// Get i to its correct position/index
 	}
@@ -210,13 +233,12 @@ TransformNode* TransformNode::nextChild(TransformNode* child) const
 }
 
 // Returns the child before the param child in the collection of children
-// in this transform node !!
+// in this transform node 
 TransformNode* TransformNode::previousChild(TransformNode* child) const
 {
 	// we must iterate through the children...
 	list<TransformNode*> ::const_iterator i = children.begin();
 
-	// Is there a way to simplify this??
 	for (; (*i) != child; i++) {
 		// Get i to its correct position/index
 	}
@@ -346,7 +368,6 @@ Polygon::~Polygon()
 		// Go delete the vertex at i
 		delete(*i);
 	}
-	// Do we need to delete anything else??
 }
 
 // Clone a Polygon

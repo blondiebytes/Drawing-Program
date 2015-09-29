@@ -123,9 +123,10 @@ void gPop()
 void drawLine(double x0, double y0, double x1, double y1)
 {
 	glBegin(GL_LINE);
-	glVertex2i(x0, y0);
-	glVertex2i(x0, x1);
+	glVertex2d(x0, y0);
+	glVertex2d(x1, y1);
 	glEnd();
+	glFlush();
 }
 
 // Consider the line that connects the vectors p0 and p1 given
@@ -188,7 +189,7 @@ void drawCircle(double x0, double y0, double x1, double y1)
 // and center of Y at cY. Draw the circle in world coordinates
 void drawCircle(double cX, double cY, double radius)
 {
-	// drawing a series of lines to make a circle ??
+	// drawing a series of lines to make a circle
 	for (double theta = 0; theta < 2 * PI; theta += DELTA) {
 		// Here, DELTA is 2PI / 360
 		drawLine(cX + radius * cos(theta),
