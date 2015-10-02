@@ -32,50 +32,55 @@ TransformNode::~TransformNode()
 	delete(matrix);
 }
 
-// Computing the Cumulative World Transform Node (CWT)
-//TransformNode* getCumulativeWorldTransform(TransformNode* node) {
-//	if (node->getParent() == NULL) {
-//		return node->getTransform;
-//	}
-//	else {
+// Computing the Cumulative World Transform Matrix (CWT)
+Matrix* TransformNode::computeCumulativeWorldTransform() const{
+	if (getParent() == NULL) {
+		return getTransform();
+	}
+	else {
 		// How do we multiply transform nodes?
-//		return getCumulativeWorldTransform(node->getParent()) * node->getTransform();
-//	}
-//}
+		return (getParent()->computeCumulativeWorldTransform())->multiply(this->getTransform());
+	}
+}
 
 // Update this transform node nto translate by (dx, dy) in world coordinates
 void TransformNode::translate(double deltaX, double deltaY)
 {
-	// transformationMatrix * originalMatrix = newMatrix
-	// X = CWT(transformNode)-1 * transformation * CWT(transformNode)
-	matrix = Matrix::translation(deltaX, deltaY)->multiply(matrix);
+	// newMatrix = CWT(transformNode)-1 * translation * CWT(transformNode)
+	Matrix* CWT = this->computeCumulativeWorldTransform();
+	Matrix* inverseCWT = CWT->getInverse; //?????
+	Matrix* translation = Matrix::translation(deltaX, deltaY);
+	matrix = inverseCWT->multiply(translation)->multiply(CWT);
 }
 
 // Update this transform node to rotate by theta around the origin in world coordinates
 void TransformNode::rotate(double theta)
 {
-	// move to the origin...!! I want deltaX to be opposite X, deltaY to be oppositeY
-	// rotationMatrix * originalMatrix = newMatrix
-	// X = newMatrix
-	// X = CWT(transformNode)-1 * transformation * CWT(transformNode)
-
-	matrix = (Matrix::rotation(theta))->multiply(matrix);
+	// X = CWT(transformNode)-1 * rotation * CWT(transformNode)
+	Matrix* CWT = this->computeCumulativeWorldTransform();
+	Matrix* inverseCWT = CWT->getInverse;
+	Matrix* rotation = Matrix::rotation(theta);
+	matrix = inverseCWT->multiply(rotation)->multiply(CWT);
 }
 
 // Update this transform node to apply shear (sXY, sYX) in world coordinates
 void TransformNode::shear(double shearXY, double shearYX)
 {
-	// shearingMatrix * originalMatrix = newMatrix
-	// X = CWT(transformNode)-1 * transformation * CWT(transformNode)
-	matrix = Matrix::shearing(shearXY, shearYX)->multiply(matrix);
+	// X = CWT(transformNode)-1 * shearing * CWT(transformNode)
+	Matrix* CWT = this->computeCumulativeWorldTransform();
+	Matrix* inverseCWT = CWT->getInverse;
+	Matrix* shearing = Matrix::shearing(shearXY, shearYX);
+	matrix = inverseCWT->multiply(shearing)->multiply(CWT);
 }
 
 // Update this transform node to apply scale(sX, sY) in world coordinates.
 void TransformNode::scale(double scaleX, double scaleY)
 {
-	// scalingMatrix * originalMatrix = newMatrix
-	// X = CWT(transformNode)-1 * transformation * CWT(transformNode)
-	matrix = Matrix::scaling(scaleX, scaleY)->multiply(matrix);
+	// X = CWT(transformNode)-1 * scaling * CWT(transformNode)
+	Matrix* CWT = this->computeCumulativeWorldTransform();
+	Matrix* inverseCWT = CWT->getInverse;
+	Matrix* scaling = Matrix::scaling(scaleX, scaleY);
+	matrix = inverseCWT->multiply(scaling)->multiply(CWT);
 }
 
 // Draw the portion of the scene represented by this transform node
@@ -170,9 +175,9 @@ TransformNode* TransformNode::clone() const
 	ShapeNode* shapeNodeCopy = shapeNode->clone();
 	TransformNode* nodeCopy = new TransformNode(NULL, shapeNodeCopy, matrixCopy);
 
-	for (list<TransformNode*> ::iterator i = children.cbegin; i != children.end(); i++) {
-		nodeCopy->addChild((*i));
-	}
+	//for (list<TransformNode*> ::iterator i = children.begin; i != children.end(); i++) {
+	//	nodeCopy->addChild((*i)); //??????
+//	}
 	
 	return nodeCopy;
 	

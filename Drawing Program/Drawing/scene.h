@@ -19,6 +19,7 @@ class TransformNode
    TransformNode(TransformNode* parent);
    TransformNode(TransformNode* parent, ShapeNode* shapeNode, Matrix* transform);
    ~TransformNode();
+   Matrix* computeCumulativeWorldTransform() const;
    void translate(double deltaX, double deltaY);
    void rotate(double theta);
    void shear(double shearXY, double shearYX);

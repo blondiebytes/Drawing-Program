@@ -122,7 +122,7 @@ void gPop()
 // in local coordinates. Draw the line in world coordinates. 
 void drawLine(double x0, double y0, double x1, double y1)
 {
-	glBegin(GL_LINE);
+	glBegin(GL_LINES);
 	glVertex2d(x0, y0);
 	glVertex2d(x1, y1);
 	glEnd();
