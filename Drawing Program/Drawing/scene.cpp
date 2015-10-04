@@ -48,7 +48,7 @@ void TransformNode::translate(double deltaX, double deltaY)
 {
 	// newMatrix = CWT(transformNode)-1 * translation * CWT(transformNode)
 	Matrix* CWT = this->computeCumulativeWorldTransform();
-	Matrix* inverseCWT = CWT->getInverse; //?????
+	Matrix* inverseCWT = CWT->getInverse(); 
 	Matrix* translation = Matrix::translation(deltaX, deltaY);
 	matrix = inverseCWT->multiply(translation)->multiply(CWT);
 }
@@ -58,7 +58,7 @@ void TransformNode::rotate(double theta)
 {
 	// X = CWT(transformNode)-1 * rotation * CWT(transformNode)
 	Matrix* CWT = this->computeCumulativeWorldTransform();
-	Matrix* inverseCWT = CWT->getInverse;
+	Matrix* inverseCWT = CWT->getInverse();
 	Matrix* rotation = Matrix::rotation(theta);
 	matrix = inverseCWT->multiply(rotation)->multiply(CWT);
 }
@@ -68,7 +68,7 @@ void TransformNode::shear(double shearXY, double shearYX)
 {
 	// X = CWT(transformNode)-1 * shearing * CWT(transformNode)
 	Matrix* CWT = this->computeCumulativeWorldTransform();
-	Matrix* inverseCWT = CWT->getInverse;
+	Matrix* inverseCWT = CWT->getInverse();
 	Matrix* shearing = Matrix::shearing(shearXY, shearYX);
 	matrix = inverseCWT->multiply(shearing)->multiply(CWT);
 }
@@ -78,7 +78,7 @@ void TransformNode::scale(double scaleX, double scaleY)
 {
 	// X = CWT(transformNode)-1 * scaling * CWT(transformNode)
 	Matrix* CWT = this->computeCumulativeWorldTransform();
-	Matrix* inverseCWT = CWT->getInverse;
+	Matrix* inverseCWT = CWT->getInverse();
 	Matrix* scaling = Matrix::scaling(scaleX, scaleY);
 	matrix = inverseCWT->multiply(scaling)->multiply(CWT);
 }
@@ -175,9 +175,10 @@ TransformNode* TransformNode::clone() const
 	ShapeNode* shapeNodeCopy = shapeNode->clone();
 	TransformNode* nodeCopy = new TransformNode(NULL, shapeNodeCopy, matrixCopy);
 
-	//for (list<TransformNode*> ::iterator i = children.begin; i != children.end(); i++) {
-	//	nodeCopy->addChild((*i)); //??????
-//	}
+	for (list<TransformNode*> ::const_iterator i = children.begin(); i != children.end(); i++) {
+		TransformNode* temp = *i;
+		nodeCopy->addChild(temp);
+	}
 	
 	return nodeCopy;
 	
@@ -308,7 +309,7 @@ ShapeNode* Line::clone() const
 	// Return a line with the appropriate specifications
 	// A line is a ShapeNode so we can return it instead of
 	// just a bland ShapeNode
-	return (Line*)(x_0, y_0, x_1, y_1, color);
+	return new Line(x_0, y_0, x_1, y_1, color);
 }
 
 // Draw a line
@@ -328,7 +329,7 @@ Rectangle::Rectangle(double xx0, double yy0, double xx1, double yy1, colorType c
 // Clone the rectangle
 ShapeNode* Rectangle::clone()  const
 {
-   return (Rectangle*)(x_0, y_0, x_1, y_1, color);
+   return new Rectangle(x_0, y_0, x_1, y_1, color);
 }
 
 // Draw the rectangle
@@ -363,7 +364,17 @@ void Circle::draw() const
 
 // Initialize a polygon of color c with vertices vs in world coordinates
 Polygon::Polygon(const list<Vector*>& vs, colorType c)
-	: ShapeNode(c), vertices(vs) {}
+	: ShapeNode(c){
+	list<Vector*> newVertices = list<Vector*>();
+	for (list<Vector*> ::const_iterator i = vs.begin(); i != vs.end(); i++) {
+		// How to copy over the new vertices? ???
+		Vector* temp = *i;
+		newVertices.push_back(new Vector(*temp));
+	}
+	vertices = newVertices;
+
+
+}
 
 // Delete a Polygon
 Polygon::~Polygon()

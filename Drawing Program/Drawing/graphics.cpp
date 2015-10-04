@@ -170,16 +170,19 @@ void drawRectangle(double x0, double y0, double x1, double y1)
 
 // Consider the circle with radius running from (x0, y0) and (x1, y1)
 // local coordinates. Draw the circle in world coordinates
+// (x0,y0) is the center of the circle; (x1, y1) is a point on the circle
 void drawCircle(double x0, double y0, double x1, double y1)
 {
 	// Find the radius --> use formula
 	double r = sqrt(((x1 - x0) * (x1 - x0)) + ((y1 - y0) * (y1 - y0)));
 
+	// Not exactly sure how to fix????
+
 	// Find cX --> center X
-	double cX = (x1 + x0) / 2;
+	double cX = x0; 
 
 	// Find cY --> center Y
-	double cY = (y1 + y0) / 2;
+	double cY = y0;
 
 	// Draw the circle
 	drawCircle(cX, cY, r);
@@ -189,6 +192,7 @@ void drawCircle(double x0, double y0, double x1, double y1)
 // and center of Y at cY. Draw the circle in world coordinates
 void drawCircle(double cX, double cY, double radius)
 {
+	// SHIFTED CIRCLE???
 	// drawing a series of lines to make a circle
 	for (double theta = 0; theta < 2 * PI; theta += DELTA) {
 		// Here, DELTA is 2PI / 360
@@ -207,7 +211,7 @@ void drawCircle(double cX, double cY, double radius)
 // point in vertices
 void drawPolygon(const list<Vector*>& vertices, bool close)
 {
-	// Setting up iterators...
+	// Setting up iterators... // NEVER ENDING! ????
 
 	// We have access to the current Vector and the next Vector
 	list<Vector*> ::const_iterator current = vertices.begin();
