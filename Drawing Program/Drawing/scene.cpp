@@ -7,7 +7,6 @@ using namespace std;
 
 // Need to fix grouping
 // parent/child relations
-// Circle in world coordinates?
 // CWT matrix?
 
 int TransformNode::count = 0;
@@ -120,6 +119,8 @@ void TransformNode::draw(bool displayHelpers) const
 		(*i)->draw(displayHelpers);
 	}
 
+	cout << "ID: " << identifier << endl;
+
 	// where do we do stuff with displayHelpers?? LATER
 
 	// Pop it all off because we are done
@@ -145,10 +146,24 @@ void TransformNode::setParent(TransformNode* p)
 // system of this node remains unchanged.
 void TransformNode::changeParent(TransformNode* newParent)
 {
-	//!! How do we take care of the coordinate system
-	// X = new matrix
-	// X = CWT(Pnew)-1 * CWT(Pold) * (old matrix)
+	// 1. Give a new matrix to the child -> new CWT matrix
+	//X = CWT(Pnew)-1 * CWT(Pold) * (old matrix)
+	Matrix* newParentCWT = newParent->computeCumulativeWorldTransform();
+	Matrix* inverseNewParentCWT = newParentCWT->getInverse();
+	Matrix* currentParentCWT = parent->computeCumulativeWorldTransform();
+	Matrix* temp = matrix;
+	matrix = inverseNewParentCWT->multiply(currentParentCWT)->multiply(matrix);
+	delete temp;
+
+	// 2. Give the child a new parent
 	parent = newParent;
+
+	// 3. For the old parent, we remove the child
+	parent->removeChild(this);
+
+	// 4. For the new parent, add the child
+	newParent->addChild(this);
+
 }
 
 // Construct a new transform node under this object. Make groupMembers children
@@ -159,16 +174,10 @@ void TransformNode::groupObjects(set<TransformNode*>& groupMembers)
 	TransformNode* temp = new TransformNode(this);
 
 	// VIA ITERATION:
-	// 1. Remove the children from their current parent
-	// 2. Make temp their new parent
+	// Change parent to temp
 	for (set<TransformNode*> ::iterator i = groupMembers.begin(); i != groupMembers.end(); i = next(i)) {
-		// Remove child from current parent
-		(*i)->getParent()->removeChild(*i);
-		// Make temp their new parent
-		temp->addChild(*i);
+		(*i)->changeParent(temp);
 	}
-	// Add temp to be a child of this transformNode
-	this->addChild(temp);
 }
 
 // Return the matrix representing the transform associated with this node

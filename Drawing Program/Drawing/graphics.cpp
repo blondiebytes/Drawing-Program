@@ -206,10 +206,11 @@ void drawCircle(double cX, double cY, double radius)
 	// drawing a series of lines to make a circle
 	for (double theta = 0; theta < 2 * PI; theta += DELTA) {
 		// Here, DELTA is 2PI / 360
-		drawLine(cX + radius * cos(theta),
-			cY + radius * sin(theta),
-			cX + radius * cos(theta + DELTA),
-			cY + radius * sin(theta + DELTA));
+		// Create two vectors so we can use drawLine(vectors) method
+		Vector* p0 = new Vector(cX + radius * cos(theta), cY + radius * sin(theta));
+		Vector* p1 = new Vector(cX + radius * cos(theta + DELTA), cY + radius * sin(theta + DELTA));
+		// Draw the pine
+		drawLine(p0, p1);
 	}
 
 }
