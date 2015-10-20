@@ -6,8 +6,7 @@
 using namespace std;
 
 // Need to fix grouping
-// parent/child relations
-// CWT matrix?
+// display helpers
 
 int TransformNode::count = 0;
 map<int, TransformNode*> TransformNode::idTransformNodeTable = map<int, TransformNode*>();
@@ -51,44 +50,24 @@ Matrix* TransformNode::computeCumulativeWorldTransform() const{
 // Update this transform node nto translate by (dx, dy) in world coordinates
 void TransformNode::translate(double deltaX, double deltaY)
 {
-	// newMatrix = CWT(transformNode) * translation * CWT(transformNode)-1
-	//Matrix* CWT = this->computeCumulativeWorldTransform();
-	//Matrix* inverseCWT = CWT->getInverse(); 
-	//Matrix* translation = Matrix::translation(deltaX, deltaY);
-	//matrix = CWT->multiply(translation)->multiply(inverseCWT);
 	matrix = Matrix::translation(deltaX, deltaY)->multiply(matrix);
 }
 
 // Update this transform node to rotate by theta around the origin in world coordinates
 void TransformNode::rotate(double theta)
 {
-	// X = CWT(transformNode) * rotation * CWT(transformNode)-1
-	//Matrix* CWT = this->computeCumulativeWorldTransform();
-	//Matrix* inverseCWT = CWT->getInverse();
-	//Matrix* rotation = Matrix::rotation(theta);
-	//matrix = CWT->multiply(rotation)->multiply(inverseCWT);
 	matrix = Matrix::rotation(theta)->multiply(matrix);
 }
 
 // Update this transform node to apply shear (sXY, sYX) in world coordinates
 void TransformNode::shear(double shearXY, double shearYX)
 {
-	// X = CWT(transformNode) * shearing * CWT(transformNode)-1
-	//Matrix* CWT = this->computeCumulativeWorldTransform();
-	//Matrix* inverseCWT = CWT->getInverse();
-	//Matrix* shearing = Matrix::shearing(shearXY, shearYX);
-	//matrix = CWT->multiply(shearing)->multiply(inverseCWT);
 	matrix = Matrix::shearing(shearXY, shearYX)->multiply(matrix);
 }
 
 // Update this transform node to apply scale(sX, sY) in world coordinates.
 void TransformNode::scale(double scaleX, double scaleY)
 {
-	//X = CWT(transformNode) * scaling * CWT(transformNode)-1
-	//Matrix* CWT = this->computeCumulativeWorldTransform();
-	//Matrix* inverseCWT = CWT->getInverse();
-	//Matrix* scaling = Matrix::scaling(scaleX, scaleY);
-	//matrix = CWT->multiply(scaling)->multiply(inverseCWT);
 	matrix = Matrix::scaling(scaleX, scaleY);
 }
 
@@ -155,11 +134,11 @@ void TransformNode::changeParent(TransformNode* newParent)
 	matrix = inverseNewParentCWT->multiply(currentParentCWT)->multiply(matrix);
 	delete temp;
 
-	// 2. Give the child a new parent
-	parent = newParent;
-
-	// 3. For the old parent, we remove the child
+	// 2. For the old parent, we remove the child
 	parent->removeChild(this);
+
+	// 3. Give the child a new parent
+	parent = newParent;
 
 	// 4. For the new parent, add the child
 	newParent->addChild(this);
@@ -174,10 +153,14 @@ void TransformNode::groupObjects(set<TransformNode*>& groupMembers)
 	TransformNode* temp = new TransformNode(this);
 
 	// VIA ITERATION:
-	// Change parent to temp
 	for (set<TransformNode*> ::iterator i = groupMembers.begin(); i != groupMembers.end(); i = next(i)) {
-		(*i)->changeParent(temp);
+		// Remove child from current parent
+		(*i)->getParent()->removeChild(*i);
+		// Make temp their new parent
+		temp->addChild(*i);
 	}
+	// Add temp to be a child of this transformNode
+	this->addChild(temp);
 }
 
 // Return the matrix representing the transform associated with this node
