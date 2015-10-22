@@ -59,6 +59,7 @@ class ShapeNode
    void setTransformNode(TransformNode* transformNode);
    TransformNode* getTransformNode();
    virtual ShapeNode* clone() const = 0;
+   colorType ShapeNode::getColor();
   private:
 	  TransformNode* transformNode;
   protected:

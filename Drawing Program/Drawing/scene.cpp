@@ -5,7 +5,6 @@
 
 using namespace std;
 
-// Need to fix grouping
 // display helpers
 
 int TransformNode::count = 0;
@@ -68,7 +67,7 @@ void TransformNode::shear(double shearXY, double shearYX)
 // Update this transform node to apply scale(sX, sY) in world coordinates.
 void TransformNode::scale(double scaleX, double scaleY)
 {
-	matrix = Matrix::scaling(scaleX, scaleY);
+	matrix = Matrix::scaling(scaleX, scaleY)->multiply(matrix);
 }
 
 // Draw the portion of the scene represented by this transform node
@@ -98,9 +97,35 @@ void TransformNode::draw(bool displayHelpers) const
 		(*i)->draw(displayHelpers);
 	}
 
-	cout << "ID: " << identifier << endl;
+	if (displayHelpers) {
+		Vector* origin = new Vector();
+		// get the location of this node
+		Vector* location = computeCumulativeWorldTransform()->multiply(origin);
+		// draw a fixed square at this node
+		double rectDelta = 5;
+		double lineDelta = 8;
+		
+		// Draw the square without the transform stack to mark the origin
+		glBegin(GL_LINE_LOOP);
+		glVertex2i((*location)[0] - rectDelta, (*location)[1] - rectDelta);
+		glVertex2i((*location)[0] - rectDelta, (*location)[1] + rectDelta);
+		glVertex2i((*location)[0] + rectDelta, (*location)[1] + rectDelta);
+		glVertex2i((*location)[0] + rectDelta, (*location)[1] - rectDelta);
+		glEnd();
 
-	// where do we do stuff with displayHelpers?? LATER
+		// Draw some cool lines too | Marking the origin
+		glBegin(GL_LINES);
+		glVertex2i((*location)[0], (*location)[1] - lineDelta);
+		glVertex2i((*location)[0], (*location)[1] + lineDelta);
+		glEnd();
+
+		glBegin(GL_LINES);
+		glVertex2i((*location)[0] - lineDelta, (*location)[1]);
+		glVertex2i((*location)[0] + lineDelta, (*location)[1]);
+		glEnd();
+
+	}
+    
 
 	// Pop it all off because we are done
 	setHighlight(oldSelected);
